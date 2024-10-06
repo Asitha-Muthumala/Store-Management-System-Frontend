@@ -1,0 +1,169 @@
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span *ngIf="userName != null" class="badge rounded-pill bg-primary">User : {{userName}}</span>
+        <button class="btn btn-sm logout-button" (click)="openLogoutConfirmationModal(logoutConfirmation)">LOGOUT</button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">Product Dashboard</h4>
+        <button class="btn btn-sm add-button" (click)="openAddProductModal(addProduct)">Add Product</button>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Product Name</th>
+                <th scope="col" class="text-start">Description</th>
+                <th scope="col" class="text-center">Unit Price</th>
+                <th scope="col" class="text-center">Quantity</th>
+                <th scope="col" class="text-end">Action</th>
+                <th scope="col" class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of products">
+                <td>{{item.name}}</td>
+                <td class="text-start">{{item.description}}</td>
+                <td class="text-center">{{item.price}}</td>
+                <td class="text-center">{{item.quantity}}</td>
+                <td class="text-end"><button type="button" class="btn btn-sm view-btn btn-info"
+                        (click)="openViewProductModal(vProduct, item.id)">view <i class="bi bi-eye"></i></button></td>
+                <td class="text-end"><button type="button" class="btn btn-sm btn-danger" (click)="deleteOneProduct(item.id)">delete <i class="bi bi-trash"></i></button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between p-2">
+        <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize"
+            (pageChange)="refreshProductList()">
+        </ngb-pagination>
+
+        <select class="form-select form-select-sm custom-select-height" [(ngModel)]="pageSize"
+            (ngModelChange)="refreshProductList()">
+            <option [ngValue]="2">2 items per page</option>
+            <option [ngValue]="4">4 items per page</option>
+            <option [ngValue]="6">6 items per page</option>
+        </select>
+    </div>
+
+    <ng-template #addProduct let-modal>
+        <div class="modal-header">
+            <h6 class="modal-title">Add Product</h6>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div style="width: 100%; display: flex; justify-content: center;">
+                <span *ngIf="successMsg != ''" class="badge rounded-pill bg-success">{{successMsg}}</span>
+                <span *ngIf="errorMsg != ''" class="badge rounded-pill bg-danger">{{errorMsg}}</span>
+            </div>
+
+            <form>
+                <div class="mb-2">
+                    <label for="pname" class="form-label custom-label">Product Name</label>
+                    <input type="text" class="form-control form-control-sm" id="pname" name="pname" [(ngModel)]="pname"
+                        [ngClass]="{'has-error' : addProductFormError['pNameRequired'] || addProductFormError['pNameNotValid']}">
+                    <p class="custom-text small" *ngIf="addProductFormError['pNameRequired'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['pNameRequired']}}</p>
+                    <p class="custom-text small" *ngIf="addProductFormError['pNameNotValid'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['pNameNotValid']}}</p>
+                </div>
+
+                <div class="mb-2">
+                    <label for="description" class="form-label custom-label">Description</label>
+                    <textarea class="form-control form-control-sm" id="description" name="description"
+                        [(ngModel)]="description"
+                        [ngClass]="{'has-error' : addProductFormError['descriptionRequired'] || addProductFormError['descriptionNotValid']}"
+                        rows="3"></textarea>
+                    <p class="custom-text small" *ngIf="addProductFormError['descriptionRequired'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['descriptionRequired']}}</p>
+                    <p class="custom-text small" *ngIf="addProductFormError['descriptionNotValid'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['descriptionNotValid']}}</p>
+                </div>
+
+                <div class="mb-2">
+                    <label for="price" class="form-label custom-label">Price</label>
+                    <input type="number" class="form-control form-control-sm" id="price" name="price"
+                        [(ngModel)]="price"
+                        [ngClass]="{'has-error' : addProductFormError['priceRequired'] || addProductFormError['priceNotValid']}">
+                    <p class="custom-text small" *ngIf="addProductFormError['priceRequired'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['priceRequired']}}</p>
+                    <p class="custom-text small" *ngIf="addProductFormError['priceNotValid'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['priceNotValid']}}</p>
+                </div>
+
+                <div class="mb-2">
+                    <label for="quantity" class="form-label custom-label">Quantity</label>
+                    <input type="number" class="form-control form-control-sm" id="quantity" name="quantity"
+                        [(ngModel)]="quantity"
+                        [ngClass]="{'has-error' : addProductFormError['quantityRequired'] || addProductFormError['quantityNotValid']}">
+                    <p class="custom-text small" *ngIf="addProductFormError['quantityRequired'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['quantityRequired']}}</p>
+                    <p class="custom-text small" *ngIf="addProductFormError['quantityNotValid'] != undefined"
+                        style="margin-bottom: 0px;">{{addProductFormError['quantityNotValid']}}</p>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+            <button type="button" class="btn btn-sm cancel-btn" (click)="clearAddProductForm()">Cancel</button>
+            <button type="button" class="btn btn-sm add-btn" (click)="addOneProduct()">Add Product</button>
+        </div>
+    </ng-template>
+
+    <ng-template #vProduct let-modal>
+        <div class="modal-header">
+            <h6 class="modal-title">View Product</h6>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+
+            <form>
+                <div class="mb-2">
+                    <label for="vpname" class="form-label custom-label">Product Name</label>
+                    <input type="text" class="form-control form-control-sm" id="pname" disabled name="vpname"
+                        [value]="vpname">
+                </div>
+
+                <div class="mb-2">
+                    <label for="vdescription" class="form-label custom-label">Description</label>
+                    <textarea class="form-control form-control-sm" id="description" disabled name="vdescription"
+                        [value]="vdescription" rows="3"></textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label for="vprice" class="form-label custom-label">Price</label>
+                    <input type="number" class="form-control form-control-sm" disabled id="vprice" name="vprice"
+                        [value]="vprice">
+                </div>
+
+                <div class="mb-2">
+                    <label for="vquantity" class="form-label custom-label">Quantity</label>
+                    <input type="number" class="form-control form-control-sm" disabled id="vquantity" name="vquantity"
+                        [value]="vquantity">
+                </div>
+            </form>
+        </div>
+    </ng-template>
+
+    <ng-template #logoutConfirmation let-modal>
+        <div class="modal-header">
+            <h6 class="modal-title">Confirmation</h6>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure want to log out?</p>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+            <button type="button" class="btn btn-sm no-btn" (click)="modal.dismiss('Cross click')">No</button>
+            <button type="button" class="btn btn-sm yes-btn" (click)="systemLogout(); modal.dismiss('Cross click')">Yes</button>
+        </div>
+    </ng-template>
+
+</div>
+
+<ngb-alert *ngIf="deleteFailed" type="danger" class="custom-alert" (close)="closeFAlert()">
+    Something went wrong.
+</ngb-alert>
+
+<ngb-alert *ngIf="deleteSuccess" type="success" class="custom-alert" (close)="closeSAlert()">
+    Successfully deleted.
+</ngb-alert>
